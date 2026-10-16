@@ -43,7 +43,14 @@ type Project = (typeof content.projects)[number]
 function ProjectCard({ item }: { item: Project }) {
   return (
     <Card className="h-full gap-4 pt-0 text-sm">
-      <div className="relative aspect-[16/10] border-b bg-muted">
+      {/* Duplicates the title link below, so it stays out of the tab order. */}
+      <a
+        href={item.href}
+        target="_blank"
+        rel="noreferrer"
+        tabIndex={-1}
+        className="relative block aspect-[16/10] border-b bg-muted"
+      >
         <img
           src={item.image}
           alt={item.alt}
@@ -51,7 +58,7 @@ function ProjectCard({ item }: { item: Project }) {
           draggable={false}
           className="absolute inset-0 size-full object-contain"
         />
-      </div>
+      </a>
 
       <CardContent className="flex flex-1 flex-col gap-3">
         <div>
