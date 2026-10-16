@@ -57,7 +57,7 @@
       "image": "./typetarget.png",
       "alt": "The TypeTarget landing page: \"Speech to text typed anywhere.\" with an Add to Chrome button",
       "caption": "typetarget.com, the landing page for the extension on the Chrome Web Store.",
-      "description": "A productivity and accessibility extension available on the Chrome Web Store. TypeTarget turns a user's browser tab audio into text typed wherever they need it: live captions for deaf or hard-of-hearing viewers, lecture or meeting notes typed into any text field, or a transcript fed straight into an AI chat to translate or summarize. Speech is transcribed privately in the browser, or in the cloud with your own Groq or Gemini key. It understands 99 spoken languages and is internationalized in 26.",
+      "description": "A free and open source productivity and accessibility extension available on the Chrome Web Store. TypeTarget turns a user's browser tab audio into text typed wherever they need it: live captions for deaf or hard-of-hearing viewers, lecture or meeting notes typed into any text field, or a transcript fed straight into an AI chat to translate or summarize. Speech is transcribed privately in the browser, or in the cloud with your own Groq or Gemini key. It understands 99 spoken languages and is internationalized in 26.",
       "links": [
         {
           "label": "Chrome Web Store",
