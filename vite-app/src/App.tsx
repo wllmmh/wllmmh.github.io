@@ -1,19 +1,18 @@
-import { useEffect, useState, type ReactNode } from "react"
+import { type ReactNode } from "react"
 import { Dialog } from "@base-ui/react/dialog"
 import {
   ArrowUpRightIcon,
   EnvelopeIcon,
-  FilePdfIcon,
   QrCodeIcon,
   XIcon,
 } from "@phosphor-icons/react"
 
 import githubLogo from "@/assets/github-logo.svg"
 import linkedinLogo from "@/assets/linkedin-logo-white.png"
-import DepthCarousel from "@/components/DepthCarousel"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import content from "@/content.json"
 
@@ -31,190 +30,76 @@ const SOCIAL_ICON: Record<string, ReactNode> = {
   Email: (
     <EnvelopeIcon className="size-4 shrink-0 text-white" aria-hidden="true" />
   ),
-  Resume: (
-    <FilePdfIcon className="size-4 shrink-0 text-white" aria-hidden="true" />
-  ),
-}
-
-/**
- * The focused card fills the column's full width — the same measure as the
- * summary above it. `cardWidth` holds the widest the column gets at each
- * breakpoint, and the component's ResizeObserver scales the card to
- * `containerWidth / cardWidth` (see DepthCarousel.jsx), so the slide renders
- * at exactly the column's current width at every viewport.
- *
- * `spread` and `depth` only shape how far the receding cards fan out and how
- * quickly they shrink; they no longer cost the focused card any width. The
- * stage clips overflow (index.css), so a receding card is free to spill past
- * the content column without causing a sideways scroll. Phones get a small
- * spread rather than none, since 0 collapses the stack into a flat single
- * image with no depth cue at all.
- */
-type CarouselGeometry = {
-  min: number
-  cardWidth: number
-  cardHeight: number
-  spread: number
-  depth: number
-  visibleCards: number
-}
-
-const CAROUSEL_BREAKPOINTS: CarouselGeometry[] = [
-  // 1056 is the column at max-w-6xl with lg padding (1152 − 96 of horizontal
-  // gutter); below that within this tier the scale simply follows the column
-  // down, always rendering the card at full width. Depth does the fan's
-  // separation: at perspective 2400 a d=1 neighbour renders at 2400/2950 ≈
-  // 0.81 its on-screen height (d=2 ≈ 0.68), so receding cards read as smaller
-  // and further back rather than fanning out at near-full height. Spread stays
-  // big enough that each neighbour's far edge still peeks well past the
-  // focused card.
-  //
-  // cardHeight is tuned to the tallest slide's content at this width (~679px
-  // of title/img/caption/description/badges) plus the article's pb-14, so
-  // nothing clips and the dots sit ~17px below the badges instead of hundreds
-  // of pixels down a fixed-height card. Shorter slides simply leave empty
-  // space below their badges.
-  {
-    min: 1024,
-    cardWidth: 1056,
-    cardHeight: 740,
-    spread: 200,
-    depth: 550,
-    visibleCards: 4,
-  },
-  {
-    min: 768,
-    cardWidth: 960,
-    cardHeight: 720,
-    spread: 175,
-    depth: 460,
-    visibleCards: 3,
-  },
-  {
-    min: 480,
-    cardWidth: 720,
-    cardHeight: 750,
-    spread: 125,
-    depth: 340,
-    visibleCards: 3,
-  },
-  // Narrow phones keep the focused card at the column's full width too
-  // (cardWidth 440 exceeds any <480 column, so the scale lands below its cap).
-  // The stage clips overflow, so this only affects the focused card's own
-  // size, not whether anything spills the column. The modest spread keeps a
-  // fan so neighbours still peek out from behind the focused card.
-  {
-    min: 0,
-    cardWidth: 440,
-    // Was 660 — too small for the tallest phone slide: Graphclone's
-    // near-square screenshot (capped at 420px) plus its long description needs
-    // ~787px, and the 660px card let flexbox crush the image/caption down onto
-    // the description. The ~850px height fits all three slides; the buttons
-    // and badges flow right after the description with the card's gap, and
-    // the dots never drift.
-    cardHeight: 850,
-    spread: 60,
-    depth: 260,
-    visibleCards: 3,
-  },
-]
-
-function pickGeometry(w: number) {
-  return CAROUSEL_BREAKPOINTS.find((b) => w >= b.min) ?? CAROUSEL_BREAKPOINTS[0]
-}
-
-function useCarouselGeometry() {
-  const [geometry, setGeometry] = useState(() =>
-    pickGeometry(typeof window === "undefined" ? 0 : window.innerWidth)
-  )
-
-  useEffect(() => {
-    // Only the breakpoint tier matters, not the exact width, so most resize
-    // events (dragging the window, mobile chrome show/hide) should never
-    // reach setState — each call re-renders App and re-triggers the
-    // carousel's ResizeObserver/GSAP layout pass. requestAnimationFrame
-    // coalesces bursts of resize events to at most one check per frame, and
-    // the tier comparison below skips the setState entirely when the width
-    // moved within the same breakpoint.
-    let frame = 0
-    const read = () => {
-      frame = 0
-      setGeometry((prev) => {
-        const next = pickGeometry(window.innerWidth)
-        return next === prev ? prev : next
-      })
-    }
-    const onResize = () => {
-      if (frame) return
-      frame = requestAnimationFrame(read)
-    }
-    window.addEventListener("resize", onResize)
-    return () => {
-      window.removeEventListener("resize", onResize)
-      if (frame) cancelAnimationFrame(frame)
-    }
-  }, [])
-
-  return geometry
 }
 
 type Project = (typeof content.projects)[number]
 
 /**
- * The screenshot and its caption span the slide's full width, the same measure
- * as the description below them, so the image's height simply follows from the
- * width and its aspect ratio. (An earlier version measured the width in JS so a
- * card border could hug the image exactly; that card chrome is gone, and with
- * it the need to measure anything.)
+ * One card per project, all visible at once in a grid. Screenshots vary in
+ * shape (16:9 app captures, a near-square wireframe), so each sits whole in a
+ * fixed 16:10 frame rather than being cropped to fill it; the frame keeps
+ * every card's text starting at the same height across a row.
  */
-function ProjectSlide({ item }: { item: Project }) {
+function ProjectCard({ item }: { item: Project }) {
   return (
-    <article className="flex h-full w-full flex-col items-stretch gap-3.5 overflow-hidden pb-14 sm:gap-4">
+    <Card className="h-full gap-4 pt-0 text-sm">
+      {/* Duplicates the title link below, so it stays out of the tab order. */}
       <a
         href={item.href}
         target="_blank"
         rel="noreferrer"
-        className="portfolio-carousel__copy inline-flex items-center gap-2 self-start font-heading text-xl font-semibold tracking-tight hover:underline sm:text-2xl"
+        tabIndex={-1}
+        className="relative block aspect-[16/10] border-b bg-muted"
       >
-        {item.title}
-        <ArrowUpRightIcon
-          className="size-4 shrink-0 sm:size-5"
-          aria-hidden="true"
-        />
-      </a>
-
-      <figure className="portfolio-carousel__shot m-0 flex w-full shrink-0 flex-col">
         <img
           src={item.image}
           alt={item.alt}
+          loading="lazy"
           draggable={false}
-          className="block max-h-[min(52svh,420px)] w-full object-contain"
+          className="absolute inset-0 size-full object-contain"
         />
-        <figcaption className="portfolio-carousel__copy w-full shrink-0 pt-3 text-center text-[0.8125rem] leading-relaxed text-pretty sm:text-sm">
-          {item.caption}
-        </figcaption>
-      </figure>
+      </a>
 
-      <p className="portfolio-carousel__copy w-full text-[length:var(--slide-body)] leading-[1.7] text-pretty">
-        {item.description}
-      </p>
-
-      {item.links.length > 0 && (
-        <div className="portfolio-carousel__copy flex flex-wrap gap-2">
-          {item.links.map((link) => (
-            <Button
-              key={link.href}
-              variant="secondary"
-              size="sm"
-              render={<a href={link.href} target="_blank" rel="noreferrer" />}
+      <CardContent className="flex flex-1 flex-col gap-3">
+        <div>
+          <h3 className="text-lg font-semibold tracking-tight">
+            <a
+              href={item.href}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 hover:underline"
             >
-              {link.label} →
-            </Button>
-          ))}
+              {item.title}
+              <ArrowUpRightIcon
+                className="size-4 shrink-0"
+                aria-hidden="true"
+              />
+            </a>
+          </h3>
+          <p className="mt-1 text-[0.8125rem] leading-relaxed text-pretty text-muted-foreground">
+            {item.caption}
+          </p>
         </div>
-      )}
 
-      <div className="portfolio-carousel__copy flex flex-wrap gap-2 pt-1">
+        <p className="leading-[1.7] text-pretty">{item.description}</p>
+
+        {item.links.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {item.links.map((link) => (
+              <Button
+                key={link.href}
+                variant="secondary"
+                size="sm"
+                render={<a href={link.href} target="_blank" rel="noreferrer" />}
+              >
+                {link.label} →
+              </Button>
+            ))}
+          </div>
+        )}
+      </CardContent>
+
+      <CardFooter className="flex-wrap gap-2">
         {item.tech.map((tech) => (
           <Badge
             key={tech}
@@ -224,14 +109,12 @@ function ProjectSlide({ item }: { item: Project }) {
             {tech}
           </Badge>
         ))}
-      </div>
-    </article>
+      </CardFooter>
+    </Card>
   )
 }
 
 export function App() {
-  const geometry = useCarouselGeometry()
-
   return (
     <div className="mx-auto flex min-h-svh max-w-6xl flex-col gap-12 px-6 py-16 sm:px-8 lg:px-12">
       <header className="flex flex-col gap-7 sm:gap-8">
@@ -265,14 +148,14 @@ export function App() {
         </p>
 
         {/* Icon-only row: labels made this read busy next to the QR glyph,
-            and these marks (mail/LinkedIn/GitHub/PDF/QR) are conventional
+            and these marks (mail/LinkedIn/GitHub/QR) are conventional
             enough to stand alone. Targets are 44px tall on touch via the
             negative-margin trick, which keeps the visual rhythm of the row
             while meeting the tap minimum. */}
         <nav
           id="contact"
           aria-label="Contact"
-          className="-my-2 -mx-1 flex flex-wrap items-center gap-x-0.5"
+          className="-mx-1 -my-2 flex flex-wrap items-center gap-x-0.5"
         >
           {content.contact.items.map((item) => (
             <a
@@ -307,10 +190,8 @@ export function App() {
               <Dialog.Popup
                 // Leaves the top ~11.5rem of the viewport clear so the
                 // header (avatar, h1, title) stays visible behind the
-                // dialog at every screen width, per the request. z-[4000]
-                // clears the carousel's arrows/dots (DepthCarousel.css,
-                // z-index: 3000) so the dialog covers them too.
-                className="fixed inset-x-0 top-[11.5rem] bottom-0 z-[4000] flex flex-col items-center gap-4 bg-background p-6 pt-8 outline-none transition-all duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0"
+                // dialog at every screen width, per the request.
+                className="fixed inset-x-0 top-[11.5rem] bottom-0 z-[4000] flex flex-col items-center gap-4 bg-background p-6 pt-8 transition-all duration-150 outline-none data-[ending-style]:opacity-0 data-[starting-style]:opacity-0"
               >
                 <Dialog.Close
                   render={
@@ -326,7 +207,7 @@ export function App() {
                 <img
                   src="./qr-code.svg"
                   alt="QR code for wllmmh.github.io"
-                  className="min-h-0 flex-1 w-full max-w-[min(90vw,32rem)] object-contain"
+                  className="min-h-0 w-full max-w-[min(90vw,32rem)] flex-1 object-contain"
                 />
                 <Dialog.Title className="font-heading text-sm tracking-[0.02em] text-muted-foreground">
                   wllmmh.github.io
@@ -347,32 +228,13 @@ export function App() {
           Portfolio
         </h2>
 
-        <div className="relative mt-8 mb-10">
-          <DepthCarousel
-            items={content.projects}
-            className="portfolio-carousel"
-            depth={geometry.depth *.6}
-            spread={geometry.spread}
-            tilt={0}
-            tiltDirection="right"
-            perspective={2400}
-            visibleCards={geometry.visibleCards * 2}
-            falloff={0.48}
-            blur={5}
-            autoplay={false}
-            loop
-            cardWidth={geometry.cardWidth}
-            cardHeight={geometry.cardHeight}
-            radius={4}
-            tint="#05060a"
-            duration={700}
-            ease="power3.out"
-            autoplayDelay={3200}
-            showControls={false}
-            showIndicators={true}
-            renderItem={(item) => <ProjectSlide item={item} />}
-          />
-        </div>
+        <ul className="mt-8 grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2">
+          {content.projects.map((item) => (
+            <li key={item.id}>
+              <ProjectCard item={item} />
+            </li>
+          ))}
+        </ul>
       </section>
     </div>
   )

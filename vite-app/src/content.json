@@ -3,10 +3,18 @@
   "title": "Software Engineer",
   "summary": "I have built production systems used by 96 of the Fortune 100 and been responsible for design systems used by other engineers to build products at scale. Few things are more satisfying to me than solving hard problems that make powerful capabilities accessible to everyday users. No CS degree, I am self taught and learn by practical application of the science.",
   "social": [
-    { "label": "LinkedIn", "href": "https://www.linkedin.com/in/williammhuynh/" },
-    { "label": "GitHub", "href": "https://github.com/williammh" },
-    { "label": "Email", "href": "mailto:whuynh23@gmail.com" },
-    { "label": "Resume", "href": "./full-stack-william-huynh.pdf", "external": true }
+    {
+      "label": "LinkedIn",
+      "href": "https://www.linkedin.com/in/williammhuynh/"
+    },
+    {
+      "label": "GitHub",
+      "href": "https://github.com/williammh"
+    },
+    {
+      "label": "Email",
+      "href": "mailto:whuynh23@gmail.com"
+    }
   ],
   "projects": [
     {
@@ -18,7 +26,10 @@
       "caption": "An agent evaluating a Bollinger rule and executing live against BTCUSD.",
       "description": "Agents that trade without requiring users to read or write code. They understand position, multiple markets and timeframes, remember and track arbitrary user-defined variables, and perform user-defined calculations on those values.",
       "links": [
-        { "label": "Read technical writeup", "href": "./livetape-technical-specs.pdf" },
+        {
+          "label": "Read technical writeup",
+          "href": "./livetape-technical-specs.pdf"
+        },
         {
           "label": "Code sample",
           "href": "https://gist.github.com/williammh/a1ccdc038f186247220c070aee1ed974"
@@ -40,6 +51,36 @@
       ]
     },
     {
+      "id": "typetarget",
+      "title": "TypeTarget",
+      "href": "https://typetarget.com",
+      "image": "./typetarget.png",
+      "alt": "The TypeTarget landing page: \"Speech to text typed anywhere.\" with an Add to Chrome button",
+      "caption": "typetarget.com, the landing page for the extension on the Chrome Web Store.",
+      "description": "A free and open source productivity and accessibility extension available on the Chrome Web Store. TypeTarget turns a user's browser tab audio into text typed wherever they need it: live captions for deaf or hard-of-hearing viewers, lecture or meeting notes typed into any text field, or a transcript fed straight into an AI chat to translate or summarize. Speech is transcribed privately in the browser, or in the cloud with your own Groq or Gemini key. It understands 99 spoken languages and is internationalized in 26.",
+      "links": [
+        {
+          "label": "Chrome Web Store",
+          "href": "https://chromewebstore.google.com/detail/typetarget-%E2%80%94-speech-to-te/adkkkjgjhpaoamhddghjikfbdmppfdbp"
+        },
+        {
+          "label": "Source code",
+          "href": "https://github.com/wllmmh/typetarget"
+        }
+      ],
+      "tech": [
+        "TypeScript",
+        "React",
+        "Chrome MV3",
+        "WebAssembly",
+        "whisper.cpp",
+        "AudioWorklet",
+        "Gemini Live",
+        "Groq",
+        "Vitest"
+      ]
+    },
+    {
       "id": "my-hand-history",
       "title": "MyHandHistory.com",
       "href": "https://myhandhistory.com",
@@ -48,7 +89,13 @@
       "caption": "Replaying a hand action by action, with hero's call graded against a Nash push/fold chart.",
       "description": "Upload a poker hand history, replay it visually, and see where hero deviated from GTO. Parses seven room formats into one hand model, replays every action street by street, and grades hero's decisions against preflop charts and postflop pot-odds heuristics — each verdict tagged with its confidence rather than guessed at. Parsing and storage happen entirely in the browser: no accounts, no upload, hands never leave the device.",
       "links": [],
-      "tech": ["TypeScript", "Next.js", "React", "IndexedDB", "Vitest"]
+      "tech": [
+        "TypeScript",
+        "Next.js",
+        "React",
+        "IndexedDB",
+        "Vitest"
+      ]
     },
     {
       "id": "graphclone",
@@ -59,24 +106,33 @@
       "caption": "A page template reconstructed by Graphclone from a live crawl, exported to PDF.",
       "description": "A site-architecture mapper for consulting scope. An async Playwright crawler traverses a target site, canonicalizes dynamic routes into a structural map, and feeds that into a wireframe builder that outputs reviewable layouts and a PRD. Supports authenticated crawls.",
       "links": [],
-      "tech": ["Python", "Playwright", "asyncio", "Next.js", "TypeScript"]
+      "tech": [
+        "Python",
+        "Playwright",
+        "asyncio",
+        "Next.js",
+        "TypeScript"
+      ]
     }
   ],
   "contact": {
     "headshot": "./headshot.png",
     "headshotAlt": "William Huynh Headshot",
     "items": [
-      { "label": "Email", "value": "whuynh23@gmail.com", "href": "mailto:whuynh23@gmail.com" },
+      {
+        "label": "Email",
+        "value": "whuynh23@gmail.com",
+        "href": "mailto:whuynh23@gmail.com"
+      },
       {
         "label": "LinkedIn",
         "value": "williammhuynh",
         "href": "https://www.linkedin.com/in/williammhuynh/"
       },
-      { "label": "GitHub", "value": "williammh", "href": "https://github.com/williammh" },
       {
-        "label": "Resume",
-        "value": "full-stack-william-huynh.pdf",
-        "href": "./full-stack-william-huynh.pdf"
+        "label": "GitHub",
+        "value": "williammh",
+        "href": "https://github.com/williammh"
       }
     ]
   }
