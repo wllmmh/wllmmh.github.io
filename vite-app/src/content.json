@@ -9,7 +9,7 @@
     },
     {
       "label": "GitHub",
-      "href": "https://github.com/williammh"
+      "href": "https://github.com/wllmmh"
     },
     {
       "label": "Email",
@@ -32,7 +32,7 @@
         },
         {
           "label": "Code sample",
-          "href": "https://gist.github.com/williammh/a1ccdc038f186247220c070aee1ed974"
+          "href": "https://gist.github.com/wllmmh/a1ccdc038f186247220c070aee1ed974"
         }
       ],
       "tech": [
@@ -100,7 +100,7 @@
     {
       "id": "graphclone",
       "title": "Graphclone",
-      "href": "https://github.com/williammh/graphclone",
+      "href": "https://github.com/wllmmh/graphclone",
       "image": "./graphclone.png",
       "alt": "A job-detail page wireframe reconstructed by Graphclone from a live crawl",
       "caption": "A page template reconstructed by Graphclone from a live crawl, exported to PDF.",
@@ -131,8 +131,8 @@
       },
       {
         "label": "GitHub",
-        "value": "williammh",
-        "href": "https://github.com/williammh"
+        "value": "wllmmh",
+        "href": "https://github.com/wllmmh"
       }
     ]
   }
